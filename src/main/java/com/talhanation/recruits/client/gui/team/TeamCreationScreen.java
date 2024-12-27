@@ -10,6 +10,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Unit;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
@@ -19,6 +20,10 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import static javax.swing.UIManager.put;
 
 
 @OnlyIn(Dist.CLIENT)
@@ -34,34 +39,9 @@ public class TeamCreationScreen extends ScreenBase<TeamCreationContainer> {
     private int teamColorId;
     private String teamColor;
     private int recruitColorIndex;
-    private int recruitColorId;
     private String recruitColor;
     public static ItemStack currency;
     public static int price;
-    public static final ArrayList<String> TEAM_COLORS = new ArrayList<>(
-            Arrays.asList("white", "aqua", "black", "blue", "dark_aqua", "dark_blue", "dark_gray", "dark_green", "dark_purple", "dark_red", "gold", "green", "light_purple", "red", "yellow"));
-    public static final ArrayList<String> UNIT_COLORS = new ArrayList<>(
-            Arrays.asList("white", "black",
-                    "light_gray", "gray", "dark_gray",
-                    "light_blue", "blue","dark_blue",
-                    "light_green", "green", "dark_green",
-                    "light_red", "red", "dark_red",
-                    "light_brown", "brown", "dark_brown",
-                    "light_cyan", "cyan", "dark_cyan",
-                    "yellow","orange", "magenta", "purple", "gold"));
-    public static final ArrayList<Integer> TeamColorID = new ArrayList<>(
-            Arrays.asList(16777215, 5636095, 0, 5592575, 43690, 170, 5592405, 43520, 11141290, 11141120, 16755200, 5635925, 16733695, 16733525, 16777045));
-
-    public static final ArrayList<Integer> UnitColorID = new ArrayList<>(
-            Arrays.asList(16777215, 0,
-                    16711935, 10141901, 16776960,
-                    12582656, 16738740, 8421504,
-                    13882323, 65535, 10494192,
-                    255, 9127187, 65280,
-                    16711680, 0, 0,
-                    0, 0, 0,
-                    0,0,0,0));
-
 
     public TeamCreationScreen(TeamCreationContainer container, Inventory playerInventory, Component title) {
         super(RESOURCE_LOCATION, container, playerInventory, new TextComponent(""));
@@ -138,7 +118,7 @@ public class TeamCreationScreen extends ScreenBase<TeamCreationContainer> {
     private Button cycleButtonRightTeamColor(int x, int y){
         return addRenderableWidget(new ExtendedButton(x, y, 12, 12, new TextComponent(">"),
                 button -> {
-                    if(this.teamColorIndex < TEAM_COLORS.size() - 1){
+                    if(this.teamColorIndex < TeamColor.values().length - 1){
                         this.teamColorIndex++;
                         this.refreshSelectedColorTeam();
 
@@ -147,8 +127,8 @@ public class TeamCreationScreen extends ScreenBase<TeamCreationContainer> {
             ));
     }
     private void refreshSelectedColorTeam() {
-        this.teamColor = TEAM_COLORS.get(teamColorIndex);
-        this.teamColorId = TeamColorID.get(teamColorIndex);
+        this.teamColor = TeamColor.fromIndex(teamColorIndex).getName();
+        this.teamColorId = TeamColor.fromIndex(teamColorIndex).getColorValue();
     }
 
     private Button cycleButtonLeftRecruitColor(int x, int y){
@@ -165,7 +145,7 @@ public class TeamCreationScreen extends ScreenBase<TeamCreationContainer> {
     private Button cycleButtonRightRecruitColor(int x, int y){
         return addRenderableWidget(new ExtendedButton(x, y, 12, 12, new TextComponent(">"),
                 button -> {
-                    if(this.recruitColorIndex < UNIT_COLORS.size() - 1){
+                    if(this.recruitColorIndex < UnitColor.values().length - 1){
                         this.recruitColorIndex++;
                         this.refreshSelectedColorRecruit();
                     }
@@ -173,7 +153,7 @@ public class TeamCreationScreen extends ScreenBase<TeamCreationContainer> {
         ));
     }
     private void refreshSelectedColorRecruit() {
-        this.recruitColor = UNIT_COLORS.get(recruitColorIndex);
+        this.recruitColor = UnitColor.fromIndex(recruitColorIndex).getName();
     }
     @Override
     protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
@@ -229,6 +209,114 @@ public class TeamCreationScreen extends ScreenBase<TeamCreationContainer> {
         input = input.replaceAll("[^a-zA-Z0-9\\s]+", "");
 
         return input;
+    }
+
+    public enum TeamColor {
+        WHITE("white", 16777215, 0),
+        AQUA("aqua", 5636095, 1),
+        BLACK("black", 0, 2),
+        BLUE("blue", 5592575, 3),
+        DARK_AQUA("dark_aqua", 43690, 4),
+        DARK_BLUE("dark_blue", 170, 5),
+        DARK_GRAY("dark_gray", 5592405, 6),
+        DARK_GREEN("dark_green", 43520, 7),
+        DARK_PURPLE("dark_purple", 11141290, 8),
+        DARK_RED("dark_red", 11141120, 9),
+        GOLD("gold", 16755200, 10),
+        GREEN("green", 5635925, 11),
+        LIGHT_PURPLE("light_purple", 16733695, 12),
+        RED("red", 16733525, 13),
+        YELLOW("yellow", 16777045, 14);
+
+        private final String name;
+        private final int colorValue;
+        private final int index;
+
+        TeamColor(String name, int colorValue, int index) {
+            this.name = name;
+            this.colorValue = colorValue;
+            this.index = index;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getColorValue() {
+            return colorValue;
+        }
+
+        public int getIndex() {
+            return index;
+        }
+
+        public static TeamColor fromIndex(int index) {
+            for (TeamColor color : TeamColor.values()) {
+                if (color.getIndex() == index) {
+                    return color;
+                }
+            }
+            throw new IllegalArgumentException("Invalid index for TeamColor: " + index);
+        }
+    }
+
+    public enum UnitColor {
+        WHITE("white", 16777215, 0),
+        BLACK("black", 0, 1),
+        LIGHT_GRAY("light_gray", 16711935, 2),
+        GRAY("gray", 10141901, 3),
+        DARK_GRAY("dark_gray", 16776960, 4),
+        LIGHT_BLUE("light_blue", 12582656, 5),
+        BLUE("blue", 16738740, 6),
+        DARK_BLUE("dark_blue", 8421504, 7),
+        LIGHT_GREEN("light_green", 13882323, 8),
+        GREEN("green", 65535, 9),
+        DARK_GREEN("dark_green", 10494192, 10),
+        LIGHT_RED("light_red", 255, 11),
+        RED("red", 9127187, 12),
+        DARK_RED("dark_red", 65280, 13),
+        LIGHT_BROWN("light_brown", 16711680, 14),
+        BROWN("brown", 0, 15),
+        DARK_BROWN("dark_brown", 0, 16),
+        LIGHT_CYAN("light_cyan", 0, 17),
+        CYAN("cyan", 0, 18),
+        DARK_CYAN("dark_cyan", 0, 19),
+        YELLOW("yellow", 0, 20),
+        ORANGE("orange", 0, 21),
+        MAGENTA("magenta", 0, 22),
+        PURPLE("purple", 0, 23),
+        GOLD("gold", 0, 24);
+
+        private final String name;
+        private final int colorValue;
+        private final int index;
+
+        UnitColor(String name, int colorValue, int index) {
+            this.name = name;
+            this.colorValue = colorValue;
+            this.index = index;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getColorValue() {
+            return colorValue;
+        }
+
+        public int getIndex() {
+            return index;
+        }
+
+        public static UnitColor fromIndex(int index) {
+            for (UnitColor color : UnitColor.values()) {
+                if (color.getIndex() == index) {
+                    return color;
+                }
+            }
+            throw new IllegalArgumentException("Invalid index for UnitColor: " + index);
+        }
     }
 
 }
