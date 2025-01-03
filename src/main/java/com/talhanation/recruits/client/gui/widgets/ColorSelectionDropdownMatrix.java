@@ -8,7 +8,6 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.FastColor;
 
-import *;
 import java.awt.*;
 import java.util.List;
 import java.util.function.Consumer;
@@ -26,21 +25,23 @@ public class ColorSelectionDropdownMatrix extends AbstractWidget {
     private final int colorSize = 16;
     private final int columns;
     private final int rows;
-
+    private final String name;
     public ColorSelectionDropdownMatrix(TeamEditScreen parent, int x, int y, int width, int height, List<Color> options, Consumer<Color> onSelect) {
         super(x, y, width, height, TextComponent.EMPTY);
         this.parent = parent;
         this.selectedOption = parent.getSelectedUnitColor();
+        this.name = TeamEditScreen.unitColorsNames.get(parent.getSelectedUnitColorNameIndex()).getString();
         this.options = options;
         this.onSelect = onSelect;
-        this.columns = 4;
-        this.rows = 4;
+        this.columns = 5;
+        this.rows = 5;
+
     }
 
     public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float delta) {
         int margin = 2;
         fill(poseStack, this.x, this.y, this.x + this.width, this.y + this.height, BG_FILL_SELECTED);
-        drawCenteredString(poseStack, Minecraft.getInstance().font, selectedOption.getColorSpace().toString(), this.x + this.width / 2, this.y + (this.height - 8) / 2, 0xFFFFFF);
+        drawCenteredString(poseStack, Minecraft.getInstance().font, name, this.x + this.width / 2, this.y + (this.height - 8) / 2, 0xFFFFFF);
 
 
         int selectedColor = selectedOption.getRGB();

@@ -25,11 +25,13 @@ public class ColorChatFormattingSelectionDropdownMatrix extends AbstractWidget {
     private final int colorSize = 16;
     private final int columns;
     private final int rows;
+    private final String name;
 
     public ColorChatFormattingSelectionDropdownMatrix(TeamEditScreen parent, int x, int y, int width, int height, List<ChatFormatting> options, Consumer<ChatFormatting> onSelect) {
         super(x, y, width, height, TextComponent.EMPTY);
         this.parent = parent;
         this.selectedOption = parent.getSelectedTeamColor();
+        this.name = TeamEditScreen.teamColorsNames.get(parent.getSelectedTeamColorNameIndex()).getString();
         this.options = options;
         this.onSelect = onSelect;
         this.columns = 4;
@@ -39,14 +41,14 @@ public class ColorChatFormattingSelectionDropdownMatrix extends AbstractWidget {
     public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float delta) {
         int margin = 2;
         fill(poseStack, this.x, this.y, this.x + this.width, this.y + this.height, BG_FILL_SELECTED);
-        drawCenteredString(poseStack, Minecraft.getInstance().font, selectedOption.getName(), this.x + this.width / 2, this.y + (this.height - 8) / 2, 0xFFFFFF);
+        drawCenteredString(poseStack, Minecraft.getInstance().font, name, this.x + this.width / 2, this.y + (this.height - 8) / 2, 0xFFFFFF);
 
 
         int selectedColor = selectedOption.getColor() != null ? 0xFF000000 | selectedOption.getColor() : 0xFFFFFFFF; // Standard Weiß
         fillGradient(poseStack, this.x + margin, this.y + margin, this.x + margin + colorSize, this.y + margin + colorSize, selectedColor, selectedColor);
 
         if (isOpen) {
-            int dropdownStartX = this.x + this.width; // Dropdown rechts vom Hauptfeld
+            int dropdownStartX = this.x + this.width;
             int dropdownStartY = this.y;
 
             for (int i = 0; i < options.size(); i++) {
@@ -71,7 +73,6 @@ public class ColorChatFormattingSelectionDropdownMatrix extends AbstractWidget {
 
     public void onMouseClicked(double mouseX, double mouseY) {
         if (isOpen) {
-            // Prüfen, ob auf eine Option geklickt wurde
             for (int i = 0; i < options.size(); i++) {
                 int col = i % columns;
                 int row = i / columns;
@@ -81,17 +82,17 @@ public class ColorChatFormattingSelectionDropdownMatrix extends AbstractWidget {
 
                 if (isMouseOverOption((int) mouseX, (int) mouseY, optionX, optionY)) {
                     selectOption(options.get(i));
-                    isOpen = false; // Dropdown schließen nach Auswahl
+                    isOpen = false;
                     return;
                 }
             }
         }
 
-        // Prüfen, ob auf die Anzeige geklickt wurde
+
         if (isMouseOverDisplay((int) mouseX, (int) mouseY)) {
-            isOpen = !isOpen; // Dropdown öffnen/schließen
+            isOpen = !isOpen;
         } else {
-            isOpen = false; // Dropdown schließen, wenn Klick außerhalb
+            isOpen = false;
         }
     }
 
@@ -113,7 +114,7 @@ public class ColorChatFormattingSelectionDropdownMatrix extends AbstractWidget {
     private boolean isMouseOverDropdown(int mouseX, int mouseY) {
         if (!isOpen) return false;
 
-        int dropdownStartX = this.x + this.width; // Dropdown rechts der Anzeige
+        int dropdownStartX = this.x + this.width;
         int dropdownStartY = this.y;
 
         int dropdownEndX = dropdownStartX + columns * cellSize;
