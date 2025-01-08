@@ -3,17 +3,12 @@ package com.talhanation.recruits.network;
 import com.talhanation.recruits.Main;
 import com.talhanation.recruits.TeamEvents;
 import com.talhanation.recruits.config.RecruitsServerConfig;
-import com.talhanation.recruits.world.RecruitsPlayerInfo;
-import com.talhanation.recruits.world.RecruitsTeam;
 import de.maxhenkel.corelib.net.Message;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MessageToServerRequestUpdateTeamEdit implements Message<MessageToServerRequestUpdateTeamEdit> {
 
@@ -32,7 +27,7 @@ public class MessageToServerRequestUpdateTeamEdit implements Message<MessageToSe
         if(player != null && player.getTeam() != null){
             Main.SIMPLE_CHANNEL.send(PacketDistributor.PLAYER.with(()-> (ServerPlayer) player),
                     new MessageToClientUpdateTeamCreationScreen(TeamEvents.getCurrency(), RecruitsServerConfig.TeamCreationCost.get(), RecruitsServerConfig.MaxRecruitsForPlayer.get(),
-                            TeamEvents.recruitsTeamManager.getTeamByName(player.getTeam().getName()).maxNPCsPerPlayer));
+                            TeamEvents.recruitsTeamManager.getTeamByStringID(player.getTeam().getName()).maxNPCsPerPlayer));
         }
     }
 

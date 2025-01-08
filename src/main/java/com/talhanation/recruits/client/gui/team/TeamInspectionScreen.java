@@ -3,7 +3,6 @@ package com.talhanation.recruits.client.gui.team;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.talhanation.recruits.Main;
-import com.talhanation.recruits.client.gui.ConfirmScreen;
 import com.talhanation.recruits.client.gui.component.BannerRenderer;
 import com.talhanation.recruits.client.gui.diplomacy.DiplomacyTeamListScreen;
 import com.talhanation.recruits.client.gui.player.IPlayerSelection;
@@ -147,7 +146,7 @@ public class TeamInspectionScreen extends ListScreenBase implements IPlayerSelec
                                     recruitsTeam.setTeamLeaderID(playerInfo.getUUID());
                                     recruitsTeam.setTeamLeaderName(playerInfo.getName());
 
-                                    Main.SIMPLE_CHANNEL.sendToServer(new MessageSaveTeamSettings(recruitsTeam, recruitsTeam.getTeamName()));
+                                    Main.SIMPLE_CHANNEL.sendToServer(new MessageSaveTeamSettings(recruitsTeam));
                                     onClose();
                             }
                         ));
@@ -257,7 +256,7 @@ public class TeamInspectionScreen extends ListScreenBase implements IPlayerSelec
         String name = "";
 
         if(recruitsTeam != null){
-            name = recruitsTeam.getTeamName();
+            name = recruitsTeam.getTeamDisplayName();
         }
         return new TextComponent(name);
     }

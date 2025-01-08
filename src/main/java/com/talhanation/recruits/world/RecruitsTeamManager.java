@@ -40,13 +40,13 @@ public class RecruitsTeamManager {
     }
 
     @Nullable
-    public RecruitsTeam getTeamByName(String teamName) {
-        return teams.get(teamName);
+    public RecruitsTeam getTeamByStringID(String stringID) {
+        return teams.get(stringID);
     }
 
-    public List<ServerPlayer> getPlayersInTeam(String teamName, ServerLevel level) {
+    public List<ServerPlayer> getPlayersInTeam(String stringID, ServerLevel level) {
         Scoreboard scoreboard = level.getScoreboard();
-        PlayerTeam playerTeam = scoreboard.getPlayerTeam(teamName);
+        PlayerTeam playerTeam = scoreboard.getPlayerTeam(stringID);
 
         List<ServerPlayer> list = new ArrayList<>();
 
@@ -72,7 +72,7 @@ public class RecruitsTeamManager {
 
     public void addTeam(String teamName, UUID leaderUUID, String leaderName, CompoundTag bannerNbt, byte color, ChatFormatting teamColor) {
         RecruitsTeam recruitsTeam = new RecruitsTeam();
-        recruitsTeam.setTeamName(teamName);
+        recruitsTeam.setStringID(teamName);
         recruitsTeam.setTeamLeaderID(leaderUUID);
         recruitsTeam.setTeamLeaderName(leaderName);
         recruitsTeam.setBanner(bannerNbt);
@@ -90,7 +90,7 @@ public class RecruitsTeamManager {
         List<RecruitsTeam> list = getTeams().stream().toList();
         boolean equ = false;
         for(RecruitsTeam recruitsTeam : list){
-            equ = recruitsTeam.getTeamName().toLowerCase().strip().equals(teamName.toLowerCase());
+            equ = recruitsTeam.getStringID().toLowerCase().strip().equals(teamName.toLowerCase());
         }
         return equ;
     }

@@ -37,7 +37,6 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
 public class  TeamEvents {
@@ -185,7 +184,7 @@ public class  TeamEvents {
     }
 
     public static void updateTeamInspectMenu(ServerPlayer player, ServerLevel level, String team){
-        RecruitsTeam recruitsTeam = recruitsTeamManager.getTeamByName(team);
+        RecruitsTeam recruitsTeam = recruitsTeamManager.getTeamByStringID(team);
 
         if(recruitsTeam != null){
             ItemStack bannerStack = ItemStack.of(recruitsTeam.getBanner());
@@ -211,7 +210,7 @@ public class  TeamEvents {
 
             PlayerTeam playerTeam = server.getScoreboard().getPlayerTeam(teamName);
 
-            RecruitsTeam recruitsTeam = recruitsTeamManager.getTeamByName(teamName);
+            RecruitsTeam recruitsTeam = recruitsTeamManager.getTeamByStringID(teamName);
 
             boolean isLeader;
             if(recruitsTeam != null) {
@@ -257,21 +256,20 @@ public class  TeamEvents {
         return false;
     }
 
-    public static void modifyTeam(ServerLevel level, String name, RecruitsTeam editedTeam) {
+    public static void modifyTeam(ServerLevel level, String stringID, RecruitsTeam editedTeam) {
         MinecraftServer server = level.getServer();
-        RecruitsTeam recruitsTeam = recruitsTeamManager.getTeamByName(name);
-        PlayerTeam playerTeam = server.getScoreboard().getPlayerTeam(name);
+        RecruitsTeam recruitsTeam = recruitsTeamManager.getTeamByStringID(stringID);
+        PlayerTeam playerTeam = server.getScoreboard().getPlayerTeam(stringID);
 
         if(recruitsTeam != null && playerTeam != null){
-            recruitsTeam.setTeamLeaderID(editedTeam.getTeamLeaderUUID());
-            recruitsTeam.setTeamName(editedTeam.getTeamName());
+            recruitsTeam.setTeamDisplayName(editedTeam.getTeamDisplayName());
             recruitsTeam.setTeamLeaderID(editedTeam.getTeamLeaderUUID());
             recruitsTeam.setTeamLeaderName(editedTeam.getTeamLeaderName());
             recruitsTeam.setBanner(editedTeam.getBanner());
             recruitsTeam.setUnitColor(editedTeam.getUnitColor());
             recruitsTeam.setTeamColor(editedTeam.getTeamColor());
 
-            playerTeam.setDisplayName(new TextComponent(editedTeam.getTeamName()));
+            playerTeam.setDisplayName(new TextComponent(editedTeam.getTeamDisplayName()));
             playerTeam.setColor(ChatFormatting.getById(editedTeam.getTeamColor()));
         }
     }
@@ -318,7 +316,7 @@ public class  TeamEvents {
 
             serverSideUpdateTeam(level);
 
-            RecruitsTeam recruitsTeam = recruitsTeamManager.getTeamByName(teamName);
+            RecruitsTeam recruitsTeam = recruitsTeamManager.getTeamByStringID(teamName);
             Main.SIMPLE_CHANNEL.send(PacketDistributor.PLAYER.with(()-> playerToAdd), new MessageToClientSetDiplomaticToast(8, recruitsTeam));
 
             List<ServerPlayer> playersInTeam = TeamEvents.recruitsTeamManager.getPlayersInTeam(teamName, level);
@@ -355,7 +353,7 @@ public class  TeamEvents {
     }
 
     public static void addPlayerToData(ServerLevel level, String teamName, int x, String namePlayerToAdd){
-        RecruitsTeam recruitsTeam = recruitsTeamManager.getTeamByName(teamName);;
+        RecruitsTeam recruitsTeam = recruitsTeamManager.getTeamByStringID(teamName);;
 
         recruitsTeam.addPlayer(x);
 
@@ -364,7 +362,7 @@ public class  TeamEvents {
         }
     }
     public static void addNPCToData(ServerLevel level, String teamName, int x){
-        RecruitsTeam recruitsTeam = recruitsTeamManager.getTeamByName(teamName);;
+        RecruitsTeam recruitsTeam = recruitsTeamManager.getTeamByStringID(teamName);;
 
         if(recruitsTeam != null){
             recruitsTeam.addNPCs(x);
@@ -372,15 +370,15 @@ public class  TeamEvents {
         else Main.LOGGER.error("Could not modify recruits team: "+ teamName + ".Team does not exist.");
     }
 
-    public static void sendJoinRequest(ServerLevel level, ServerPlayer player, String teamName) {
-        RecruitsTeam recruitsTeam = recruitsTeamManager.getTeamByName(teamName);
+    public static void sendJoinRequest(ServerLevel level, ServerPlayer player, String stringID) {
+        RecruitsTeam recruitsTeam = recruitsTeamManager.getTeamByStringID(stringID);
 
         if(recruitsTeam != null){
             if(recruitsTeam.addPlayerAsJoinRequest(player.getName().getString())){
                 Main.SIMPLE_CHANNEL.send(PacketDistributor.PLAYER.with(()-> recruitsTeamManager.getTeamLeader(recruitsTeam, level)), new MessageToClientSetDiplomaticToast(7, recruitsTeam, player.getName().getString()));
             }
         }
-        else Main.LOGGER.error("Could not add join request for "+ teamName + ".Team does not exist.");
+        else Main.LOGGER.error("Could not add join request for "+ stringID + ".Team does not exist.");
     }
 
     public static void tryToRemoveFromTeam(Team team, ServerPlayer serverPlayer, ServerPlayer potentialRemovePlayer, ServerLevel level, String nameToRemove, boolean menu) {
@@ -658,7 +656,7 @@ public class  TeamEvents {
     public static void addRecruitToTeam(AbstractRecruitEntity recruit, Team team, ServerLevel level){
         String teamName = team.getName();
         PlayerTeam playerteam = level.getScoreboard().getPlayerTeam(teamName);
-        RecruitsTeam recruitsTeam = recruitsTeamManager.getTeamByName(teamName);
+        RecruitsTeam recruitsTeam = recruitsTeamManager.getTeamByStringID(teamName);
 
         boolean flag = playerteam != null && level.getScoreboard().addPlayerToTeam(recruit.getStringUUID(), playerteam);
         if (!flag) {

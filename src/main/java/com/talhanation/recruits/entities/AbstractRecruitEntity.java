@@ -43,10 +43,7 @@ import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.OpenDoorGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.entity.animal.AbstractFish;
 import net.minecraft.world.entity.animal.IronGolem;
-import net.minecraft.world.entity.animal.Squid;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.monster.AbstractIllager;
@@ -1743,7 +1740,7 @@ public abstract class AbstractRecruitEntity extends AbstractInventoryEntity{
 
     private void updateColor(String name) {
         if(!this.getCommandSenderWorld().isClientSide()){
-            RecruitsTeam recruitsTeam = TeamEvents.recruitsTeamManager.getTeamByName(name);
+            RecruitsTeam recruitsTeam = TeamEvents.recruitsTeamManager.getTeamByStringID(name);
             if(recruitsTeam != null && recruitsTeam.getUnitColor() != this.getColor()){
                 this.setColor(recruitsTeam.getUnitColor());
                 this.needsColorUpdate = false;

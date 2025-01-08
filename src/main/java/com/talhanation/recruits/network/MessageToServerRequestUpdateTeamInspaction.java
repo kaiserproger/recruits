@@ -30,7 +30,7 @@ public class MessageToServerRequestUpdateTeamInspaction implements Message<Messa
         ServerPlayer player = context.getSender();
         List<ServerPlayer> playerList = (List<ServerPlayer>) player.getCommandSenderWorld().players();
         List<RecruitsPlayerInfo> playerInfoList = new ArrayList<>();
-        RecruitsTeam recruitsTeam = TeamEvents.recruitsTeamManager.getTeamByName(player.getTeam().getName());
+        RecruitsTeam recruitsTeam = TeamEvents.recruitsTeamManager.getTeamByStringID(player.getTeam().getName());
 
         for(ServerPlayer serverPlayer : playerList){
             if(serverPlayer.getTeam() != null && serverPlayer.getTeam().equals(player.getTeam())){

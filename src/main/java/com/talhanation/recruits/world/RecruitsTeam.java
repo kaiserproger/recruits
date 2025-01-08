@@ -10,7 +10,8 @@ import java.util.UUID;
 
 
 public class RecruitsTeam {
-    public String teamName;
+    public String stringID;
+    public String teamDisplayName;
     public UUID teamLeaderID;
     public String teamLeaderName;
     public CompoundTag banner;
@@ -23,8 +24,9 @@ public class RecruitsTeam {
     public int maxNPCs;
     public int maxNPCsPerPlayer;
     private int biome = -1;
-    public RecruitsTeam(String teamName, String teamLeaderName, CompoundTag banner) {
-        this.teamName = teamName;
+    public RecruitsTeam(String stringID, String teamLeaderName, CompoundTag banner) {
+        this.stringID = stringID;
+        this.teamDisplayName = stringID;
         this.teamLeaderName = teamLeaderName;
         this.banner = banner;
     }
@@ -41,16 +43,23 @@ public class RecruitsTeam {
         return teamLeaderID;
     }
 
-    public String getTeamName() {
-        return teamName;
+    public String getStringID() {
+        return stringID;
+    }
+    public String getTeamDisplayName() {
+        return teamDisplayName;
     }
 
     public String getTeamLeaderName()  {
         return teamLeaderName;
     }
 
-    public void setTeamName(String teamname) {
-        teamName = teamname;
+    public void setStringID(String stringID) {
+        this.stringID = stringID;
+    }
+
+    public void setTeamDisplayName(String teamDisplayName) {
+        this.teamDisplayName = teamDisplayName;
     }
 
     public void setTeamLeaderID(UUID uuid) {
@@ -130,12 +139,13 @@ public class RecruitsTeam {
 
     @Override
     public String toString() {
-        return this.getTeamName();
+        return this.getStringID();
     }
 
     public CompoundTag toNBT() {
         CompoundTag nbt = new CompoundTag();
-        nbt.putString("teamName", this.teamName);
+        nbt.putString("teamName", this.stringID);
+        nbt.putString("teamDisplayName", this.teamDisplayName);
         nbt.putUUID("teamLeaderID", this.teamLeaderID);
         nbt.putString("teamLeaderName", this.teamLeaderName);
         nbt.put("banner", this.banner);
@@ -162,7 +172,13 @@ public class RecruitsTeam {
             return null;
         }
         RecruitsTeam team = new RecruitsTeam();
-        team.setTeamName(nbt.getString("teamName"));
+        team.setStringID(nbt.getString("teamName"));
+        if(nbt.getString("teamDisplayName").isEmpty()){
+            team.setTeamDisplayName(team.getStringID());
+        }
+        else
+            team.setTeamDisplayName(nbt.getString("teamDisplayName"));
+
         team.setTeamLeaderID(nbt.getUUID("teamLeaderID"));
         team.setTeamLeaderName(nbt.getString("teamLeaderName"));
         team.setBanner(nbt.getCompound("banner"));

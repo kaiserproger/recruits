@@ -14,7 +14,6 @@ import com.talhanation.recruits.client.gui.widgets.SelectedPlayerWidget;
 import com.talhanation.recruits.network.MessageCreateTeam;
 import com.talhanation.recruits.network.MessageSaveTeamSettings;
 import com.talhanation.recruits.network.MessageToServerRequestUpdateTeamEdit;
-import com.talhanation.recruits.network.MessageToServerRequestUpdateTeamInspaction;
 import com.talhanation.recruits.world.RecruitsPlayerInfo;
 import com.talhanation.recruits.world.RecruitsTeam;
 import net.minecraft.ChatFormatting;
@@ -69,6 +68,7 @@ public class TeamEditScreen extends RecruitsScreenBase {
     private ItemStack banner;
     private Button saveButton;
     public static int maxRecruitsPerPlayerConfigSetting;
+
     public static final ArrayList<ChatFormatting> teamColors = new ArrayList<>(
             Arrays.asList(
                     ChatFormatting.BLACK,
@@ -114,31 +114,31 @@ public class TeamEditScreen extends RecruitsScreenBase {
     //list index are important
     public static final ArrayList<Color> unitColors = new ArrayList<>(
             Arrays.asList(
-                Color.WHITE,
-                Color.BLACK,
-                Color.LIGHT_GRAY,
-                Color.GRAY,
-                Color.DARK_GRAY,
-                Color.BLUE.brighter(),
-                Color.BLUE,
-                Color.BLUE.darker(),
-                Color.GREEN.brighter(),
-                Color.GREEN,
-                Color.GREEN.darker(),
-                Color.RED.brighter(),
-                Color.RED,
-                Color.RED.darker(),
-                new Color(196, 164, 132), //light brown
-                new Color(150, 75, 0), //Brown
-                new Color(92, 64, 51), // dark brown
-                Color.CYAN.brighter(),
-                Color.CYAN,
-                Color.CYAN.darker(),
-                Color.YELLOW,
-                Color.ORANGE,
-                Color.MAGENTA,
-                new Color(160, 32, 240),//Purple
-                new Color(255, 215,0)// Gold
+                    new Color(255, 255, 255), // White
+                    new Color(0, 0, 0),       // Black
+                    new Color(211, 211, 211), // Light Gray
+                    new Color(128, 128, 128), // Gray
+                    new Color(64, 64, 64),    // Dark Gray
+                    new Color(51, 123, 154), // Light Blue
+                    new Color(51, 92, 154),     // Blue
+                    new Color(21, 37, 62),     // Dark Blue
+                    new Color(38, 156, 8), // Light Green
+                    new Color(0, 128, 0),     // Green
+                    new Color(14, 57, 3),     // Dark Green
+                    new Color(185, 21, 21), // Light Red (Pink)
+                    new Color(148, 16, 16),     // Red
+                    new Color(74, 8, 8),     // Dark Red
+                    new Color(140, 76, 24), // Light Brown
+                    new Color(94, 59, 29),    // Brown
+                    new Color(63, 39, 19),    // Dark Brown
+                    new Color(0, 150, 150), // Light Cyan
+                    new Color(23, 68, 68),   // Cyan
+                    new Color(11, 34, 34),   // Dark Cyan
+                    new Color(237, 202, 18),   // Yellow
+                    new Color(229, 106, 17),   // Orange
+                    new Color(255, 0, 255),   // Magenta
+                    new Color(87, 2, 101),  // Purple
+                    new Color(221, 154, 25)    // Gold
             )
     );
 
@@ -190,11 +190,13 @@ public class TeamEditScreen extends RecruitsScreenBase {
             this.teamColor = ChatFormatting.getById(recruitsTeam.getTeamColor());
             this.unitColor = unitColors.get(recruitsTeam.getUnitColor());
             this.leaderInfo = new RecruitsPlayerInfo(recruitsTeam.getTeamLeaderUUID(), recruitsTeam.getTeamLeaderName(), recruitsTeam);
+            maxRecruitsPerPlayer = recruitsTeam.getMaxNPCsPerPlayer();
         }
         else {
             this.teamColor = teamColors.get(15);
             this.unitColor = unitColors.get(0);
             this.leaderInfo = new RecruitsPlayerInfo(player.getUUID(), player.getName().getString());
+            maxRecruitsPerPlayer = maxRecruitsPerPlayerConfigSetting;
         }
 
         setWidgets();
@@ -208,7 +210,7 @@ public class TeamEditScreen extends RecruitsScreenBase {
 
     private void setWidgets() {
         clearWidgets();
-        String teamName = recruitsTeam != null ? recruitsTeam.getTeamName() : "";
+        String teamName = recruitsTeam != null ? recruitsTeam.getTeamDisplayName() : "";
         int textsX = 46;
         int gap = 3;
         int widgetsX = 107;
@@ -315,7 +317,7 @@ public class TeamEditScreen extends RecruitsScreenBase {
             saveButton = new Button(guiLeft + 30, guiTop + ySize - 102, 75, 20, SAVE,
                     btn -> {
                         recruitsTeam.setTeamLeaderID(this.leaderInfo.getUUID());
-                        recruitsTeam.setTeamName(textFieldTeamName.getValue());
+                        recruitsTeam.setTeamDisplayName(textFieldTeamName.getValue());
                         recruitsTeam.setTeamColor(teamColor.getId());
                         if(banner != null){
                             recruitsTeam.setBanner(banner.getTag());
@@ -323,7 +325,7 @@ public class TeamEditScreen extends RecruitsScreenBase {
                         recruitsTeam.setUnitColor((byte) unitColors.indexOf(unitColor));
                         recruitsTeam.setMaxNPCsPerPlayer(maxRecruitsPerPlayer);
 
-                        Main.SIMPLE_CHANNEL.sendToServer(new MessageSaveTeamSettings(recruitsTeam, recruitsTeam.getTeamName()));
+                        Main.SIMPLE_CHANNEL.sendToServer(new MessageSaveTeamSettings(recruitsTeam));
                     }
             );
 
