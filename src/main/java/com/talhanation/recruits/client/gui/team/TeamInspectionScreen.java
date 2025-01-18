@@ -3,6 +3,7 @@ package com.talhanation.recruits.client.gui.team;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.talhanation.recruits.Main;
+import com.talhanation.recruits.TeamEvents;
 import com.talhanation.recruits.client.gui.component.BannerRenderer;
 import com.talhanation.recruits.client.gui.diplomacy.DiplomacyTeamListScreen;
 import com.talhanation.recruits.client.gui.player.IPlayerSelection;
@@ -67,6 +68,8 @@ public class TeamInspectionScreen extends ListScreenBase implements IPlayerSelec
     private boolean postInit;
     private int gapBottom;
     private int gapTop;
+    public static boolean isEditingAllowed;
+    public static boolean isManagingAllowed;
 
     public TeamInspectionScreen(Screen parent, Player player){
         super(new TextComponent("TeamInspection"),236,0);
@@ -119,9 +122,10 @@ public class TeamInspectionScreen extends ListScreenBase implements IPlayerSelec
 
         editButton = new Button(guiLeft + 169, guiTop + 99, 60, 20, EDIT_BUTTON,
                 button -> {
-                    minecraft.setScreen(new TeamEditScreen(this, player, recruitsTeam));
+                    TeamEvents.openTeamEditScreen(player);
+            //minecraft.setScreen(new TeamEditScreen(this, player, recruitsTeam));
                 });
-        editButton.visible = isTeamLeader;
+        editButton.visible = isTeamLeader && isEditingAllowed;
         addRenderableWidget(editButton);
 
         diplomacyButton = new Button(guiLeft + 87, guiTop + 99, 60, 20, DIPLOMACY_BUTTON,
@@ -134,7 +138,7 @@ public class TeamInspectionScreen extends ListScreenBase implements IPlayerSelec
                 button -> {
                     minecraft.setScreen(new TeamManageScreen(this, player, recruitsTeam));
                 });
-        manageButton.visible = isTeamLeader;
+        manageButton.visible = isTeamLeader && isManagingAllowed;
         addRenderableWidget(manageButton);
 
         //leave team

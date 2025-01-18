@@ -99,25 +99,37 @@ public class  TeamEvents {
         }
     }
 
-    public static void openTeamCreationScreen(Player player) {
-        if (player instanceof ServerPlayer) {
-            //Main.SIMPLE_CHANNEL.send(PacketDistributor.PLAYER.with(()-> (ServerPlayer) player), new MessageToClientUpdateTeamCreationScreen(TeamEvents.getCurrency(), RecruitsServerConfig.TeamCreationCost.get(), RecruitsServerConfig.MaxRecruitsForPlayer.get()));
-            NetworkHooks.openGui((ServerPlayer) player, new MenuProvider() {
+    public static void openTeamEditScreen(Player player) {
+        if (player instanceof ServerPlayer serverPlayer) {
+            RecruitsTeam recruitsTeam = null;
+            if(serverPlayer.getTeam() != null) {
+                recruitsTeam = TeamEvents.recruitsTeamManager.getTeamByStringID(player.getTeam().getName());
+            }
+
+            Main.SIMPLE_CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
+                    new MessageToClientUpdateTeamEditScreen(TeamEvents.getCurrency(),
+                            RecruitsServerConfig.TeamCreationCost.get(),
+                            RecruitsServerConfig.MaxRecruitsForPlayer.get(),
+                            recruitsTeam
+                    ));
+
+            NetworkHooks.openGui(serverPlayer, new MenuProvider() {
 
                 @Override
                 public Component getDisplayName() {
-                    return new TextComponent("team_creation_screen");
+                    return new TextComponent("team_edit_screen");
                 }
 
                 @Override
                 public AbstractContainerMenu createMenu(int i, Inventory playerInventory, Player playerEntity) {
-                    return new TeamCreationContainer(i, playerInventory);
+                    return new TeamEditMenu(i, playerInventory);
                 }
             }, packetBuffer -> {
                 packetBuffer.writeUUID(player.getUUID());
             });
-        } else {
-            Main.SIMPLE_CHANNEL.sendToServer(new MessageOpenTeamCreationScreen(player));
+        }
+        else {
+            Main.SIMPLE_CHANNEL.sendToServer(new MessageOpenTeamEditScreen(player));
         }
     }
     public static boolean createTeam(boolean menu, ServerPlayer serverPlayer, @NotNull ServerLevel level, String teamName, String playerName, ItemStack banner, ChatFormatting color, byte colorByte) {
@@ -268,6 +280,7 @@ public class  TeamEvents {
             recruitsTeam.setBanner(editedTeam.getBanner());
             recruitsTeam.setUnitColor(editedTeam.getUnitColor());
             recruitsTeam.setTeamColor(editedTeam.getTeamColor());
+            recruitsTeam.setMaxNPCsPerPlayer(editedTeam.getMaxNPCsPerPlayer());
 
             playerTeam.setDisplayName(new TextComponent(editedTeam.getTeamDisplayName()));
             playerTeam.setColor(ChatFormatting.getById(editedTeam.getTeamColor()));

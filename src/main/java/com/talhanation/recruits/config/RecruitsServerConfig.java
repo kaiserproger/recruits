@@ -67,8 +67,9 @@ public class RecruitsServerConfig{
     public static ForgeConfigSpec.BooleanValue RecruitsChunkLoading;
     public static ForgeConfigSpec.BooleanValue UpdateCheckerServerside;
     public static ForgeConfigSpec.BooleanValue CompatCorpseMod;
-
     public static ForgeConfigSpec.IntValue MaxPlayersInTeam;
+    public static ForgeConfigSpec.BooleanValue ShouldTeamEditingBeAllowed;
+    public static ForgeConfigSpec.BooleanValue ShouldTeamManagingBeAllowed;
 
     public static ForgeConfigSpec.IntValue MaxRecruitsInTeam;
     public static ArrayList<String> TARGET_BLACKLIST = new ArrayList<>(
@@ -586,6 +587,22 @@ public class RecruitsServerConfig{
                         \tdefault: 500""")
                 .worldRestart()
                 .defineInRange("MaxRecruitsInTeam", 500, 0, 1453);
+
+        ShouldTeamEditingBeAllowed = BUILDER.comment("""
+
+                        Should editing the team be allowed by team leaders. (Editing Team Colors, Name ,...)
+                        \t(takes effect after restart)
+                        \tdefault: true""")
+                .worldRestart()
+                .define("ShouldTeamEditingBeAllowed", true);
+
+        ShouldTeamManagingBeAllowed = BUILDER.comment("""
+
+                        Should managing the team be allowed by team leaders. (Add/Remove Players...)
+                        \t(takes effect after restart)
+                        \tdefault: true""")
+                .worldRestart()
+                .define("ShouldTeamEditingBeAllowed", true);
 
 
         BUILDER.comment("Global Team Settings")

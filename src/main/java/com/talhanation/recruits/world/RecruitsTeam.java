@@ -22,7 +22,7 @@ public class RecruitsTeam {
     public int teamColor;
     public int maxPlayers;
     public int maxNPCs;
-    public int maxNPCsPerPlayer;
+    public int maxNPCsPerPlayer = -1;
     private int biome = -1;
     public RecruitsTeam(String stringID, String teamLeaderName, CompoundTag banner) {
         this.stringID = stringID;
@@ -133,8 +133,8 @@ public class RecruitsTeam {
         this.teamColor = color;
     }
 
-    public void setMaxNPCsPerPlayer(int maxNpcsPerPlayer) {
-        this.maxNPCsPerPlayer = maxNpcsPerPlayer;
+    public void setMaxNPCsPerPlayer(int maxNPCsPerPlayer) {
+        this.maxNPCsPerPlayer = maxNPCsPerPlayer;
     }
 
     @Override
@@ -162,7 +162,7 @@ public class RecruitsTeam {
         nbt.putInt("teamColor", this.teamColor);
         nbt.putInt("maxPlayers", this.maxPlayers);
         nbt.putInt("biome", this.biome);
-        nbt.putInt("maxNpcsPerPlayer", this.maxNPCsPerPlayer);
+        nbt.putInt("maxNPCsPerPlayer", this.maxNPCsPerPlayer);
 
         return nbt;
     }
@@ -191,10 +191,10 @@ public class RecruitsTeam {
         team.setPlayers(nbt.getInt("players"));
         team.setNPCs(nbt.getInt("npcs"));
         team.setUnitColor(nbt.getByte("unitColor"));
-        team.setTeamColor(nbt.getByte("teamColor"));
+        team.setTeamColor(nbt.getInt("teamColor"));
         team.maxPlayers = nbt.getInt("maxPlayers");
         team.biome = nbt.getInt("biome");
-        team.setMaxNPCsPerPlayer(nbt.getInt("maxNpcsPerPlayer"));
+        team.setMaxNPCsPerPlayer(nbt.getInt("maxNPCsPerPlayer"));
         return team;
     }
 
