@@ -72,6 +72,7 @@ public class TeamEditScreen extends ScreenBase<TeamEditMenu> {
     private int guiLeft;
     private int guiTop;
     private int totalCost;
+    private String teamNameSavedValue;
     public static int playerCurrencyCount;
     private boolean hasChanges;
     public static final ArrayList<ChatFormatting> teamColors = new ArrayList<>(
@@ -181,6 +182,7 @@ public class TeamEditScreen extends ScreenBase<TeamEditMenu> {
         super(TEXTURE, container, playerInventory, new TextComponent(""));
         this.imageHeight = 240;
         this.imageWidth = 222;
+        this.teamNameSavedValue = "";
         this.player = playerInventory.player;
         this.menu.setScreen(this);
     }
@@ -243,7 +245,11 @@ public class TeamEditScreen extends ScreenBase<TeamEditMenu> {
 
     private void setWidgets() {
         clearWidgets();
-        String teamName = recruitsTeam != null ? recruitsTeam.getTeamDisplayName() : "";
+        String teamName = this.teamNameSavedValue;
+        if(recruitsTeam != null) {
+            teamName = recruitsTeam.getTeamDisplayName();
+        }
+
         int textsX = 46;
         int gap = 3;
         int widgetsX = 107;
@@ -419,7 +425,7 @@ public class TeamEditScreen extends ScreenBase<TeamEditMenu> {
             totalCost = creationPrice;
         }
 
-        currency.setCount(totalCost);
+        if(currency != null) currency.setCount(totalCost);
     }
 
     private void setUnitColor(Color color) {
@@ -515,7 +521,7 @@ public class TeamEditScreen extends ScreenBase<TeamEditMenu> {
         boolean nameLength = this.textFieldTeamName.getValue().length() >= 3 && this.textFieldTeamName.getValue().length() <= 24;
         boolean sufficientEmeralds =  playerCurrencyCount >= creationPrice || player.isCreative();
 
-        return !this.banner.isEmpty() && nameLength && this.leaderInfo != null && sufficientEmeralds;
+        return this.banner != null && !this.banner.isEmpty() && nameLength && this.leaderInfo != null && sufficientEmeralds;
     }
 
     private boolean checkEditCondition(){
@@ -553,6 +559,8 @@ public class TeamEditScreen extends ScreenBase<TeamEditMenu> {
             calculateCost();
             saveButton.active = checkEditCondition();
         }
+
+        this.teamNameSavedValue = string;
     }
 
     public void onPlayerInventoryChanged(){

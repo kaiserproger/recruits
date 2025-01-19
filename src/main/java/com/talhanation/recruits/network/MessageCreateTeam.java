@@ -1,5 +1,6 @@
 package com.talhanation.recruits.network;
 
+import com.talhanation.recruits.Main;
 import com.talhanation.recruits.TeamEvents;
 import de.maxhenkel.corelib.net.Message;
 import net.minecraft.ChatFormatting;
@@ -9,6 +10,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.network.NetworkEvent;
+
+import java.io.IOException;
 
 public class MessageCreateTeam implements Message<MessageCreateTeam> {
 
@@ -40,7 +43,11 @@ public class MessageCreateTeam implements Message<MessageCreateTeam> {
     public MessageCreateTeam fromBytes(FriendlyByteBuf buf) {
         this.teamName = buf.readUtf();
         this.banner = buf.readItem();
-        this.color = ChatFormatting.valueOf(buf.readUtf());
+        String codeWithoutFormatting = buf.readUtf().replaceAll("§", "");
+
+
+        this.color = ChatFormatting.getByCode(codeWithoutFormatting.charAt(0));
+
         this.index = buf.readInt();
         return this;
     }
