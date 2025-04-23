@@ -13,6 +13,8 @@ public class RecruitMountEntity extends Goal {
     private final AbstractRecruitEntity recruit;
     private Entity mount;
     private int timeToRecalcPath;
+    private int searchTime;
+    private static final int MAX_SEARCH_TIME = 400;
 
     public RecruitMountEntity(AbstractRecruitEntity recruit) {
         this.recruit = recruit;
@@ -20,17 +22,18 @@ public class RecruitMountEntity extends Goal {
 
     @Override
     public boolean canUse() {
-        return recruit.getShouldMount();
+        return recruit.getShouldMount ();
     }
 
     public boolean canContinueToUse() {
-        return canUse();
+        return canUse () && searchTime < MAX_SEARCH_TIME;
     }
 
-    public void start(){
+    public void start() {
         this.timeToRecalcPath = 0;
-        this.findMount();
-        this.recruit.setMountTimer(200);
+        this.searchTime = 0;
+        this.findMount ();
+        this.recruit.setMountTimer (200);
     }
 
     public boolean requiresUpdateEveryTick() {
@@ -38,37 +41,45 @@ public class RecruitMountEntity extends Goal {
     }
 
     public void tick() {
-        if(this.recruit.getVehicle() == null && this.mount != null) {
-            if(recruit.getMountTimer() > 0){
+        searchTime++;
+        if (this.recruit.getVehicle () == null && this.mount != null) {
+            if (recruit.getMountTimer () > 0) {
 
                 if (--this.timeToRecalcPath <= 0) {
-                    this.timeToRecalcPath = this.adjustedTickDelay(10);
-                    recruit.getNavigation().moveTo(mount, 1.15F);
+                    this.timeToRecalcPath = this.adjustedTickDelay (10);
+                    recruit.getNavigation ().moveTo (mount, 1.15F);
                 }
 
                 if (recruit.horizontalCollision || recruit.minorHorizontalCollision) {
-                    this.recruit.getJumpControl().jump();
+                    this.recruit.getJumpControl ().jump ();
                 }
 
-                if (recruit.distanceToSqr(mount) < 50D) {
-                    recruit.startRiding(mount);
-                    if(recruit.isPassenger()) recruit.setShouldMount(false);
+                if (recruit.distanceToSqr (mount) < 50D) {
+                    recruit.startRiding (mount);
+                    if (recruit.isPassenger ()) recruit.setShouldMount (false);
                 }
+            } else {
+                recruit.setShouldMount (false);
             }
-            else recruit.setShouldMount(false);
+        } else if (searchTime >= MAX_SEARCH_TIME) {
+            recruit.setShouldMount (false);
         }
     }
 
-    private void findMount(){
-        recruit.getLevel().getEntitiesOfClass(
+    private void findMount() {
+        List<Entity> mounts = recruit.getCommandSenderWorld ().getEntitiesOfClass (
                 Entity.class,
-                recruit.getBoundingBox().inflate(32D),
-                (mount) -> recruit.getMountUUID() != null &&
-                        mount.getUUID().equals(recruit.getMountUUID()) &&
-                        (RecruitsServerConfig.MountWhiteList.get().contains(mount.getEncodeId()) ||
-                                mount instanceof AbstractHorse)
-        ).forEach((mount) -> {
-            this.mount = mount;
-        });
+                recruit.getBoundingBox ().inflate (20D),
+                (mount) -> (RecruitsServerConfig.MountWhiteList.get ().contains (mount.getEncodeId ()) ||
+                        mount instanceof AbstractHorse) &&
+                        !mount.isVehicle () &&
+                        mount.getPassengers ().isEmpty ()
+        );
+
+        if (!mounts.isEmpty ()) {
+            this.mount = mounts.stream ()
+                    .min ((m1, m2) -> Double.compare (recruit.distanceToSqr (m1), recruit.distanceToSqr (m2)))
+                    .orElse (null);
+        }
     }
 }
